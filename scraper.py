@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 
+import os
+
+os.environ['SCRAPERWIKI_DATABASE_NAME'] = 'sqlite:///data.sqlite'
+
 import scraperwiki
 import lxml.html
 
@@ -31,10 +35,11 @@ for row in tablerows:
   scraperwiki.sqlite.save(
     unique_keys=['id'],
     data={
-      "id":               nicename(name),
-      "name":             name,
-      "price_today":      price_per_liter(price_today),
-      "price_yesterday":  price_per_liter(price_yesterday),
-      "price_difference": price_per_liter(price_difference)
-    }
+      'id':               nicename(name),
+      'name':             name,
+      'price_today':      price_per_liter(price_today),
+      'price_yesterday':  price_per_liter(price_yesterday),
+      'price_difference': price_per_liter(price_difference)
+    },
+    table_name='data'
   )
