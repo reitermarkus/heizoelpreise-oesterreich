@@ -15,7 +15,7 @@ def inner_html(self):
 
 
 def nicename(self):
-  return self.lower().replace('ä', 'ae').replace('ö', 'oe').replace('ü', 'ue')
+  return self.lower().replace(u'ä', 'ae').replace(u'ö', 'oe').replace(u'ü', 'ue')
 
 
 for row in tablerows:
