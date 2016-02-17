@@ -1,24 +1,38 @@
-# This is a template for a Python scraper on morph.io (https://morph.io)
-# including some code snippets below that you should find helpful
+# -*- coding: utf-8 -*-
 
-# import scraperwiki
-# import lxml.html
-#
-# # Read in a page
-# html = scraperwiki.scrape("http://foo.com")
-#
-# # Find something on the page using css selectors
-# root = lxml.html.fromstring(html)
-# root.cssselect("div[align='left']")
-#
-# # Write out to the sqlite database using scraperwiki library
-# scraperwiki.sqlite.save(unique_keys=['name'], data={"name": "susan", "occupation": "software developer"})
-#
-# # An arbitrary query against the database
-# scraperwiki.sql.select("* from data where 'name'='peter'")
+import scraperwiki
+import lxml.html
 
-# You don't have to do things with the ScraperWiki and lxml libraries.
-# You can use whatever libraries you want: https://morph.io/documentation/python
-# All that matters is that your final data is written to an SQLite database
-# called "data.sqlite" in the current working directory which has at least a table
-# called "data".
+html = scraperwiki.scrape("http://www.fastenergy.at/heizoelpreis-tendenz.htm")
+
+
+tablerows = lxml.html.fromstring(html).cssselect(".trend3 tr:not(:first-child)")
+
+
+
+def inner_html(self):
+  return self.text_content().lstrip().rstrip()
+
+
+def nicename(self):
+  return self.lower().replace('ä', 'ae').replace('ö', 'oe').replace('ü', 'ue')
+
+
+for row in tablerows:
+
+  name             = inner_html(row.cssselect("td:nth-child(1)")[0])
+  price_today      = inner_html(row.cssselect("td:nth-child(2)")[0])
+  price_yesterday  = inner_html(row.cssselect("td:nth-child(3)")[0])
+  price_difference = inner_html(row.cssselect("td:nth-child(4)")[0])
+
+
+  scraperwiki.sqlite.save(
+    unique_keys=['id'],
+    data={
+      "id":               nicename(name),
+      "name":             name,
+      "price_today":      price_today,
+      "price_yesterday":  price_yesterday,
+      "price_difference": price_difference
+    }
+  )
