@@ -13,7 +13,7 @@ def nicename(name):
 
 
 def price_per_liter(price):
-  return float(".%s" % price.replace(u'€', '').rstrip().replace(',', ''))
+  return float(price.replace(u'€', '').rstrip().replace(',', '.')) / 100
 
 
 html = scraperwiki.scrape("http://www.fastenergy.at/heizoelpreis-tendenz.htm")
