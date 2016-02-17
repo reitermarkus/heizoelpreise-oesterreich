@@ -4,11 +4,16 @@ import scraperwiki
 import lxml.html
 
 
-def inner_html(self):
-  return self.text_content().lstrip().rstrip()
+def inner_html(html):
+  return html.text_content().strip()
 
-def nicename(self):
-  return self.lower().replace(u'ä', 'ae').replace(u'ö', 'oe').replace(u'ü', 'ue')
+
+def nicename(name):
+  return name.lower().replace(u'ä', 'ae').replace(u'ö', 'oe').replace(u'ü', 'ue')
+
+
+def price_per_liter(price):
+  return float(".%s" % price.replace(u'€', '').rstrip().replace(',', ''))
 
 
 html = scraperwiki.scrape("http://www.fastenergy.at/heizoelpreis-tendenz.htm")
@@ -27,9 +32,8 @@ for row in tablerows:
     data={
       "id":               nicename(name),
       "name":             name,
-      "price_today":      price_today,
-      "price_yesterday":  price_yesterday,
-      "price_difference": price_difference
-    },
-    table_name='data'
+      "price_today":      price_per_liter(price_today),
+      "price_yesterday":  price_per_liter(price_yesterday),
+      "price_difference": price_per_liter(price_difference)
+    }
   )
