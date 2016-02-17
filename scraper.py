@@ -20,6 +20,7 @@ html = scraperwiki.scrape("http://www.fastenergy.at/heizoelpreis-tendenz.htm")
 
 tablerows = lxml.html.fromstring(html).cssselect(".trend3 tr:not(:first-child)")
 
+
 for row in tablerows:
 
   name             = inner_html(row.cssselect("td:nth-child(1)")[0])
