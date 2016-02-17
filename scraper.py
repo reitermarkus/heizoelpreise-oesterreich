@@ -3,20 +3,17 @@
 import scraperwiki
 import lxml.html
 
-html = scraperwiki.scrape("http://www.fastenergy.at/heizoelpreis-tendenz.htm")
-
-
-tablerows = lxml.html.fromstring(html).cssselect(".trend3 tr:not(:first-child)")
-
-
 
 def inner_html(self):
   return self.text_content().lstrip().rstrip()
 
-
 def nicename(self):
   return self.lower().replace(u'ä', 'ae').replace(u'ö', 'oe').replace(u'ü', 'ue')
 
+
+html = scraperwiki.scrape("http://www.fastenergy.at/heizoelpreis-tendenz.htm")
+
+tablerows = lxml.html.fromstring(html).cssselect(".trend3 tr:not(:first-child)")
 
 for row in tablerows:
 
@@ -24,7 +21,6 @@ for row in tablerows:
   price_today      = inner_html(row.cssselect("td:nth-child(2)")[0])
   price_yesterday  = inner_html(row.cssselect("td:nth-child(3)")[0])
   price_difference = inner_html(row.cssselect("td:nth-child(4)")[0])
-
 
   scraperwiki.sqlite.save(
     unique_keys=['id'],
