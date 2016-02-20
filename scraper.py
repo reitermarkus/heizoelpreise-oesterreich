@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
-import os
 
+import os
 os.environ['SCRAPERWIKI_DATABASE_NAME'] = 'sqlite:///data.sqlite'
 
-import scraperwiki
 import lxml.html
+import scraperwiki
+import time
 
 
 def inner_html(html):
@@ -20,26 +21,35 @@ def price_per_liter(price):
   return round(float(price.replace(u'€', '').replace(',', '.').strip()) / 100, 4)
 
 
-html = scraperwiki.scrape("http://www.fastenergy.at/heizoelpreis-tendenz.htm")
+timeout = time.time() + 86400
+delay = 60 * 30
 
-tablerows = lxml.html.fromstring(html).cssselect(".trend3 tr:not(:first-child)")
 
+while time.time() < timeout:
 
-for row in tablerows:
+  print(time.strftime('%Y-%m-%d %H:%M:%S %Z'))
 
-  name             = inner_html(row.cssselect("td:nth-child(1)")[0])
-  price_today      = inner_html(row.cssselect("td:nth-child(2)")[0])
-  price_yesterday  = inner_html(row.cssselect("td:nth-child(3)")[0])
-  price_difference = inner_html(row.cssselect("td:nth-child(4)")[0])
+  html = scraperwiki.scrape("http://www.fastenergy.at/heizoelpreis-tendenz.htm")
 
-  scraperwiki.sqlite.save(
-    unique_keys=['id'],
-    data={
-      'id':               nicename(name),
-      'name':             name,
-      'price_today':      price_per_liter(price_today),
-      'price_yesterday':  price_per_liter(price_yesterday),
-      'price_difference': price_per_liter(price_difference)
-    },
-    table_name='data'
-  )
+  tablerows = lxml.html.fromstring(html).cssselect(".trend3 tr:not(:first-child)")
+
+  for row in tablerows:
+
+    name             = inner_html(row.cssselect("td:nth-child(1)")[0])
+    price_today      = inner_html(row.cssselect("td:nth-child(2)")[0])
+    price_yesterday  = inner_html(row.cssselect("td:nth-child(3)")[0])
+    price_difference = inner_html(row.cssselect("td:nth-child(4)")[0])
+
+    scraperwiki.sqlite.save(
+      unique_keys=['id'],
+      data={
+        'id':               nicename(name),
+        'name':             name,
+        'price_today':      price_per_liter(price_today),
+        'price_yesterday':  price_per_liter(price_yesterday),
+        'price_difference': price_per_liter(price_difference)
+      },
+      table_name='data'
+    )
+
+    time.sleep(delay)
