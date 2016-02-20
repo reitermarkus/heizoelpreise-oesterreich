@@ -27,7 +27,7 @@ tablerows = lxml.html.fromstring(html).cssselect(".trend3 tr:not(:first-child)")
 for row in tablerows:
 
   name             = inner_html(row, 1)
-  id               = name.lower().replace(u'ä', 'ae').replace(u'ö', 'oe').replace(u'ü', 'ue')
+  name_id          = name.lower().replace(u'ä', 'ae').replace(u'ö', 'oe').replace(u'ü', 'ue')
   price_today      = inner_html(row, 2)
   price_yesterday  = inner_html(row, 3)
   price_difference = inner_html(row, 4)
@@ -35,7 +35,7 @@ for row in tablerows:
   scraperwiki.sqlite.save(
     unique_keys=['id'],
     data={
-      'id':               id,
+      'id':               name_id,
       'name':             name,
       'price_today':      price_per_liter(price_today),
       'price_yesterday':  price_per_liter(price_yesterday),
