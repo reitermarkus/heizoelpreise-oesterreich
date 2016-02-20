@@ -21,35 +21,37 @@ def price_per_liter(price):
   return round(float(price.replace(u'€', '').replace(',', '.').strip()) / 100, 4)
 
 
-timeout = time.time() + 86400
-delay = 60 * 30
+start = time.time()
 
 
-while time.time() < timeout:
+html = scraperwiki.scrape("http://www.fastenergy.at/heizoelpreis-tendenz.htm")
 
-  print(time.strftime('%Y-%m-%d %H:%M:%S %Z'))
+tablerows = lxml.html.fromstring(html).cssselect(".trend3 tr:not(:first-child)")
 
-  html = scraperwiki.scrape("http://www.fastenergy.at/heizoelpreis-tendenz.htm")
+for row in tablerows:
 
-  tablerows = lxml.html.fromstring(html).cssselect(".trend3 tr:not(:first-child)")
+  name             = inner_html(row.cssselect("td:nth-child(1)")[0])
+  price_today      = inner_html(row.cssselect("td:nth-child(2)")[0])
+  price_yesterday  = inner_html(row.cssselect("td:nth-child(3)")[0])
+  price_difference = inner_html(row.cssselect("td:nth-child(4)")[0])
 
-  for row in tablerows:
+  scraperwiki.sqlite.save(
+    unique_keys=['id'],
+    data={
+      'id':               nicename(name),
+      'name':             name,
+      'price_today':      price_per_liter(price_today),
+      'price_yesterday':  price_per_liter(price_yesterday),
+      'price_difference': price_per_liter(price_difference)
+    },
+    table_name='data'
+  )
 
-    name             = inner_html(row.cssselect("td:nth-child(1)")[0])
-    price_today      = inner_html(row.cssselect("td:nth-child(2)")[0])
-    price_yesterday  = inner_html(row.cssselect("td:nth-child(3)")[0])
-    price_difference = inner_html(row.cssselect("td:nth-child(4)")[0])
 
-    scraperwiki.sqlite.save(
-      unique_keys=['id'],
-      data={
-        'id':               nicename(name),
-        'name':             name,
-        'price_today':      price_per_liter(price_today),
-        'price_yesterday':  price_per_liter(price_yesterday),
-        'price_difference': price_per_liter(price_difference)
-      },
-      table_name='data'
-    )
+end = time.time()
 
-    time.sleep(delay)
+print("\nScraping started at\n  %s,\nended at\n  %s,\nand took\n  %f seconds." % (
+  time.strftime('%Y-%m-%d %H:%M:%S %Z', time.localtime(start)),
+  time.strftime('%Y-%m-%d %H:%M:%S %Z', time.localtime(end)),
+  (end - start)
+))
