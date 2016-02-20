@@ -9,8 +9,8 @@ import scraperwiki
 import time
 
 
-def inner_html(html):
-  return html.text_content().strip()
+def inner_html(row, column):
+  return row.cssselect("td:nth-child(%s)" % column)[0].text_content().strip()
 
 
 def nicename(name):
@@ -30,10 +30,10 @@ tablerows = lxml.html.fromstring(html).cssselect(".trend3 tr:not(:first-child)")
 
 for row in tablerows:
 
-  name             = inner_html(row.cssselect("td:nth-child(1)")[0])
-  price_today      = inner_html(row.cssselect("td:nth-child(2)")[0])
-  price_yesterday  = inner_html(row.cssselect("td:nth-child(3)")[0])
-  price_difference = inner_html(row.cssselect("td:nth-child(4)")[0])
+  name             = inner_html(row, 1)
+  price_today      = inner_html(row, 2)
+  price_yesterday  = inner_html(row, 3)
+  price_difference = inner_html(row, 4)
 
   scraperwiki.sqlite.save(
     unique_keys=['id'],
