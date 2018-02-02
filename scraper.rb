@@ -3,7 +3,7 @@ require 'mechanize'
 
 agent = Mechanize.new
 
-page = agent.get('http://www.fastenergy.at/heizoelpreis-tendenz.htm')
+page = agent.get('https://www.fastenergy.at/heizoelpreis-tendenz.htm')
 
 rows = page.search('.trend3 tr:not(:first-child)')
 
