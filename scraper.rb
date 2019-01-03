@@ -3,7 +3,7 @@ require 'mechanize'
 
 agent = Mechanize.new
 
-page = agent.get('http://www.fastenergy.at/heizoelpreis-tendenz.htm')
+page = agent.get('https://www.fastenergy.at/heizoelpreis-tendenz.htm')
 
 rows = page.search('#tabelle tbody tr')
 
@@ -23,11 +23,15 @@ rows.each do |columns|
   price_yesterday = price_per_liter.(price_yesterday)
   price_difference = price_per_liter.(price_difference)
 
-  ScraperWiki.save_sqlite([:id], {
+  data = {
     id: id,
     name: name,
     price_today: price_today,
     price_yesterday: price_yesterday,
     price_difference: price_difference,
-  })
+  }
+
+  puts data
+
+  ScraperWiki.save_sqlite([:id], data)
 end
